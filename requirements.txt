@@ -1,0 +1,7 @@
+playwright
+requests
+chromadb
+python-dotenv
+tenacity
+transformers
+torch
