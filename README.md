@@ -23,6 +23,7 @@ Apply AI paraphrasing.
 Review and refine with feedback.
 Store and query versions.
 
-🔹 Demo
-https://youtu.be/WyM2Kei_Y-8
+🔹 Demo : https://youtu.be/WyM2Kei_Y-8
+
+🔹 .env : HF_API_TOKEN
 
