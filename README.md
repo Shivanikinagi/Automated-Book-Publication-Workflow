@@ -1,32 +1,28 @@
-Automated Book Publication Workflow
+📚 Automated Book Publication Workflow
+An AI-powered pipeline for transforming web-based book chapters into polished, customized content.
 
-Overview
+🔹 Overview
+Automates the process of scraping, paraphrasing, reviewing, and versioning book chapters using AI and human feedback.
 
-This project implements an automated book publication pipeline that fetches, processes, and refines chapters from a web source. It integrates web scraping, AI-driven text paraphrasing, human-in-the-loop review, and content versioning to produce polished, customized outputs.
+🔹 Features
+Web Scraping: Extract chapter text and screenshots via Playwright.
+AI Paraphrasing: LLM-based content rephrasing with custom instructions.
+Human Review: Iterative feedback and editing support.
+Content Versioning: Store and retrieve versions using ChromaDB with RL-based search.
+Seamless Workflow: Agent-based API ensures smooth task transitions.
 
-Features
-Web Scraping: Extracts chapter text from a specified URL using Playwright and saves screenshots.
-AI Paraphrasing: Uses an LLM to rephrase content based on user instructions (e.g., "make it simple").
-Human Review: Supports iterative human feedback with edit prompts and example instructions.
-Content Versioning: Stores versions in ChromaDB and retrieves the best match using an RL search algorithm.
-Seamless Workflow: Ensures smooth content flow between agents via an agentic API.
+🔹 Tech Stack
+Python, Playwright, LLM, ChromaDB, RL Search Algorithm.
 
-Tech Stack
-Python: Core development language.
-Playwright: For web scraping and screenshot capture.
-LLM: For AI-driven paraphrasing and review.
-ChromaDB: For content storage and versioning.
-RL Search Algorithm: For intelligent version retrieval.
-
-Usage
-Run the pipeline to scrape a chapter from a URL (e.g., Wikisource).
-Provide an AI instruction (e.g., "make it simple") for paraphrasing.
-Review and edit the output during human-in-the-loop iterations.
-Store and retrieve versions from ChromaDB based on query relevance.
-
-Setup
-
+🔹 Usage
 pip install -r requirements.txt
 python main.py
 
-Demo : https://youtu.be/WyM2Kei_Y-8
+Scrape content from a URL.
+Apply AI paraphrasing.
+Review and refine with feedback.
+Store and query versions.
+
+🔹 Demo
+https://youtu.be/WyM2Kei_Y-8
+
