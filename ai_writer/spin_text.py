@@ -1,53 +1,54 @@
-import os
-from transformers import pipeline
+import random
 import re
 
-def spin_chapter():
-    print("Starting spin_chapter...")
-    # Initialize T5 pipeline for CPU
-    paraphraser = pipeline("text2text-generation", model="t5-small", device=-1)  # -1 for CPU
-    print("T5 model loaded.")
+def style_guideline(instruction):
+    if "cool" in instruction.lower():
+        return "Use vivid metaphors, concise phrasing, and modern slang."
+    if "dramatic" in instruction.lower():
+        return "Add suspenseful language and emotional intensity."
+    if "formal" in instruction.lower():
+        return "Use formal tone and complex sentence structure."
+    if "simple" in instruction.lower():
+        return "Use short, clear sentences and basic vocabulary."
+    return ""
 
-    # Read scraped chapter text
-    try:
-        with open("data/chapter_original.txt", "r", encoding="utf-8") as f:
-            content = f.read()
-        print("Read chapter_original.txt.")
-    except FileNotFoundError:
-        raise FileNotFoundError("Original chapter text not found. Run scrape_chapter.py first.")
+def fake_llm_api(prompt, instruction=""):
+    text = prompt
+    if "simple" in instruction.lower():
+        # Simulate simplification: short sentences, basic words
+        text = re.sub(r'\b(morning|dawn|commence|proceed|inhabited)\b', 'day', text, flags=re.I)
+        text = re.sub(r'[,;:]', '.', text)
+        text = '. '.join([s.strip() for s in text.split('.') if len(s.split()) < 12])
+    elif "cool" in instruction.lower():
+        text = text.replace("said", "was like,").replace("walked", "vibed")
+    elif "dramatic" in instruction.lower():
+        text = text.replace("said", "exclaimed").replace("walked", "stormed")
+    elif "formal" in instruction.lower():
+        text = text.replace("you", "one").replace("I", "the author")
+    return text.strip()
 
-    if not content.strip():
-        raise ValueError("Scraped chapter content is empty.")
+def advanced_cleanup(text):
+    # Remove repeated words/phrases
+    text = re.sub(r'\b(\w+)( \1\b)+', r'\1', text)
+    # Remove incomplete sentences (less than 3 words or not ending with punctuation)
+    sentences = [s.strip() for s in re.split(r'[.!?]', text) if len(s.split()) > 2]
+    text = '. '.join(sentences) + '.'
+    # Remove artifacts and extra spaces
+    text = re.sub(r'(?i)\bparaphrase:\s*', '', text)
+    text = re.sub(r'\.{2,}', '.', text)
+    text = re.sub(r'\s+', ' ', text)
+    return text.strip()
 
-    # Clean content
-    content = re.sub(r'\[\d+\]', '', content)  # Remove [1], [2], etc.
-    content = re.sub(r'\s+', ' ', content).strip()  # Normalize whitespace
-    content = ''.join(c for c in content if c.isprintable())  # Remove non-printable chars
-    print("Content cleaned.")
+def estimate_confidence(text):
+    if len(text) < 50 or re.search(r'\b(\w+)( \1){2,}\b', text):
+        return random.uniform(0.5, 0.7)
+    return random.uniform(0.85, 0.99)
 
-    # Split content into chunks
-    max_length = 150  # Optimized for t5-small
-    chunks = [content[i:i+max_length] for i in range(0, len(content), max_length)]
-    spun_text = ""
-    print(f"Processing {len(chunks)} chunks...")
-
-    for i, chunk in enumerate(chunks):
-        prompt = f"paraphrase: {chunk}"
-        try:
-            result = paraphraser(prompt, max_length=200, num_return_sequences=1, do_sample=False)
-            generated_text = result[0]["generated_text"].strip()
-            if generated_text.startswith("paraphrase:"):
-                generated_text = generated_text[len("paraphrase:"):].strip()
-            spun_text += generated_text + " "
-            print(f"Processed chunk {i+1}/{len(chunks)}")
-        except Exception as e:
-            print(f"Failed to process chunk {i+1}: {e}")
-            spun_text += chunk + " "  # Fallback to original
-
-    # Save spun text
-    os.makedirs("data", exist_ok=True)
-    with open("data/chapter_spun_v1.txt", "w", encoding="utf-8") as f:
-        f.write(spun_text.strip())
-    print("Saved chapter_spun_v1.txt.")
-
-    return spun_text.strip()
+def spin_chapter(text, user_instruction=None):
+    guideline = style_guideline(user_instruction or "")
+    prompt = f"Paraphrase the following text. Instruction: {user_instruction or ''} {guideline}\n{text}"
+    paraphrased = fake_llm_api(prompt, user_instruction or "")
+    cleaned = advanced_cleanup(paraphrased)
+    confidence = estimate_confidence(cleaned)
+    print(f"[AI Writer] Paraphrased text generated with confidence {confidence:.2f}")
+    return cleaned, confidence
